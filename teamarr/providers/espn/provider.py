@@ -289,10 +289,13 @@ class ESPNProvider(UFCParserMixin, TournamentParserMixin, SportsProvider):
         and captures both regular season and playoff games.
         """
         events = []
+        # Start scanning from yesterday to ensure we don't miss games currently 
+        # in progress or starting soon in other timezones (e.g. US vs NZ)
         today = date.today()
+        start_date = today - timedelta(days=1)
 
-        for day_offset in range(days_ahead):
-            target_date = today + timedelta(days=day_offset)
+        for day_offset in range(days_ahead + 1):
+            target_date = start_date + timedelta(days=day_offset)
             date_str = target_date.strftime("%Y%m%d")
 
             data = self._client.get_scoreboard(league, date_str, sport_league)
